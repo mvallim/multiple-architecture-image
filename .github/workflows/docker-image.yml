@@ -35,4 +35,4 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           load: true
-          tags: mvallim/hello:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hello:latest
