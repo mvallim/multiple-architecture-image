@@ -37,7 +37,7 @@ jobs:
       - name: Build an image from Dockerfile
         working-directory: .
         run: |
-          docker buildx build --push --platform=linux/amd64,linux/arm64 --no-cache --output type=docker --load -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ github.sha }} .
+          docker buildx build --platform=linux/amd64,linux/arm64 --no-cache --output type=docker --load -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
@@ -50,3 +50,8 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+
+      - name: Build an image from Dockerfile
+        working-directory: .
+        run: |
+          docker buildx build --push --platform=linux/amd64,linux/arm64 --no-cache --output type=docker --load -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ github.sha }} .
