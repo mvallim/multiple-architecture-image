@@ -44,7 +44,7 @@ jobs:
         
         with:
           image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ github.sha }}'
-          docker-host: {{ steps.docker-setup.output.sock }}
+          docker-host: ${{ steps.docker-setup.output.sock }}
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
