@@ -42,14 +42,28 @@ jobs:
 
       - name: Build an image from Dockerfile
         run: |
-          docker buildx build --platform=linux/amd64,linux/arm64 --no-cache --output type=docker --load -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }} .
+          docker buildx build --platform=linux/amd64 --no-cache --output type=docker --load -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-amd64 .
+          docker buildx build --platform=linux/arm64 --no-cache --output type=docker --load -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-arm64 .
 
-          docker images ls --tree
+          docker manifest create docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }} docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-amd64 docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-arm64
 
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner AMD64
         uses: aquasecurity/trivy-action@0.29.0
         with:
-          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}'
+          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-amd64'
+          docker-host: ${{ steps.docker-setup.outputs.sock }}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          scanners: vuln
+          vuln-type: 'os'
+          severity: 'CRITICAL,HIGH'
+          timeout: '30m'
+
+      - name: Run Trivy vulnerability scanner ARM64
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-arm64'
           docker-host: ${{ steps.docker-setup.outputs.sock }}
           format: 'table'
           exit-code: '1'
@@ -61,4 +75,7 @@ jobs:
 
       - name: Push an image to docker.io
         run: |
-          docker image push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}
+          docker image push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-amd64 .
+          docker image push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-arm64 .
+
+          docker manifest push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}
