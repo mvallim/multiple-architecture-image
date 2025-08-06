@@ -6,6 +6,14 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+    container:
+      image: ubuntu:latest
     steps:
       - id: docker-setup
         name: Set up Docker
@@ -58,17 +66,6 @@ jobs:
           vuln-type: 'os'
           severity: 'CRITICAL,HIGH'
           timeout: '30m'
-
-      # - name: Run Trivy vulnerability scanner
-      #   uses: docker://ghcr.io/aquasecurity/trivy
-      #   with:
-      #     # We'd like to use the Github Action here like everywhere else, but it
-      #     # does not support scanning multiple images (yet), so we use the
-      #     # official Trivy image instead, override default entrypoint and run
-      #     # Trivy for every container image in the list. Fail if any image has
-      #     # vulnerabilities.
-      #     entrypoint: /bin/sh
-      #     args: -c "trivy image --clear-cache; for img in ${{env.found_images}}; do trivy image --scanners vuln --docker-host ${{ steps.docker-setup.outputs.sock }} --exit-code 1 --severity CRITICAL,HIGH --no-progress $img; done"
 
       - name: Push an image to docker.io
         run: |
