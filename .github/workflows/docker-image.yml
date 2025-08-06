@@ -73,8 +73,8 @@ jobs:
 
       - name: Push an image to docker.io
         run: |
-          docker image push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-amd64 .
-          docker image push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-arm64 .
+          docker image push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-amd64
+          docker image push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-arm64
 
           docker manifest create docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }} docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-amd64 docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hello:${{ steps.vars.outputs.COMMIT_SHORT_SHA }}-arm64
 
